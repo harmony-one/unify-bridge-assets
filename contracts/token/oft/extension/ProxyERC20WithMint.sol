@@ -33,12 +33,16 @@ contract ProxyERC20WithMint is OFTCore {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable token;
+    
+    uint256 public totalTransferred;
 
     constructor(
         address _lzEndpoint,
-        address _proxyToken
+        address _proxyToken,
+        uint256 _initTotalTransfered,
     ) OFTCore(_lzEndpoint) {
         token = IERC20(_proxyToken);
+        totalTransferred = _initTotalTransfered;
     }
 
     function circulatingSupply() public view virtual override returns (uint) {
@@ -54,6 +58,8 @@ contract ProxyERC20WithMint is OFTCore {
         uint _amount
     ) internal virtual override returns (uint256) {        
         require(_from == _msgSender(), "ProxyOFT: owner is not send caller");
+        require(_amount <= totalTransferred, "ProxyOFT: transfer amount exceeds available balance");
+
         BurnableToken(address(token)).burnFrom(_from, _amount);
 
         uint256 _balanceBefore = token.balanceOf(msg.sender);
@@ -71,5 +77,7 @@ contract ProxyERC20WithMint is OFTCore {
         uint _amount
     ) internal virtual override {
         MintableToken(address(token)).mint(_toAddress, _amount);
+
+        totalTransferred = totalTransferred.add(_amount);
     }
 }

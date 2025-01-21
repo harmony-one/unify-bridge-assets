@@ -45,6 +45,10 @@ contract ProxyERC20WithMint is OFTCore {
         totalTransferred = _initTotalTransfered;
     }
 
+    function setTotalTransferred(uint256 _newTotal) external onlyOwner {
+        totalTransferred = _newTotal;
+    }
+
     function circulatingSupply() public view virtual override returns (uint) {
         unchecked {
             return token.totalSupply() - token.balanceOf(address(this));
@@ -67,6 +71,8 @@ contract ProxyERC20WithMint is OFTCore {
         uint256 _balanceAfter = token.balanceOf(msg.sender);
         
         uint256 _actualAmount = _balanceBefore.sub(_balanceAfter);
+        
+        totalTransferred = totalTransferred.sub(_actualAmount);
 
         return _actualAmount;
     }

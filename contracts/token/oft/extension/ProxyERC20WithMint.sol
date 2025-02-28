@@ -64,8 +64,6 @@ contract ProxyERC20WithMint is OFTCore {
         require(_from == _msgSender(), "ProxyOFT: owner is not send caller");
         require(_amount <= totalTransferred, "ProxyOFT: transfer amount exceeds available balance");
 
-        BurnableToken(address(token)).burnFrom(_from, _amount);
-
         uint256 _balanceBefore = token.balanceOf(msg.sender);
         BurnableToken(address(token)).burnFrom(_from, _amount);
         uint256 _balanceAfter = token.balanceOf(msg.sender);
